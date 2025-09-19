@@ -2,6 +2,6 @@ fastapi
 uvicorn
 python-multipart
 pdfminer.six
-
-
+google-generativeai
+python-dotenv
 
