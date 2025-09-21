@@ -1,14 +1,20 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
-from services.summarizer import generate_summary
+import os
+import google.generativeai as genai
+from fastapi import HTTPException
 
-router = APIRouter()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-class SummarizeRequest(BaseModel):
-    text: str
+def generate_summary(text: str) -> str:
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Input text is empty, cannot summarize.")
 
-@router.post("/summarize")
-async def summarize(request: SummarizeRequest):
-    summary = generate_summary(request.text)
-    return {"summary": summary}
+    try:
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(
+            f"Summarize this text in simple, concise points:\n\n{text}"
+        )
+        return response.text
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Summarization failed: {str(e)}")
+
 
