@@ -1,6 +1,9 @@
-
 from fastapi import FastAPI
 from routers import health, pdf, summarize
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 app = FastAPI(title="PaperSummarizer Pro API")
 
