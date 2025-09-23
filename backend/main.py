@@ -1,30 +1,21 @@
 from fastapi import FastAPI, Request
 from routers import health, pdf, summarize
 from dotenv import load_dotenv
-import logging
-from logging.handlers import RotatingFileHandler
+from logger import logger
 import time
 
 load_dotenv()
-
-LOG_FILE = "logs/app.log"
-handler = RotatingFileHandler(LOG_FILE, maxBytes=5000000, backupCount=5)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[handler, logging.StreamHandler()]
-)
-logger = logging.getLogger(__name__)
 
 app = FastAPI(title="PaperSummarizer Pro API")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    idem = time.time()
-    logger.info(f"Start request {request.method} {request.url}")
+    start_time = time.time()
     response = await call_next(request)
-    duration = time.time() - idem
-    logger.info(f"Completed in {duration:.2f}s → {response.status_code}")
+    duration = round(time.time() - start_time, 3)
+    logger.info(
+        f"{request.method} {request.url.path} completed_in={duration}s status={response.status_code}"
+    )
     return response
 
 app.include_router(health.router)
