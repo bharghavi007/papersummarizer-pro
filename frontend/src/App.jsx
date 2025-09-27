@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar"
+import PdfUpload from "./components/PdfUpload"
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <p className="text-center mt-4 text-gray-300">
           Upload your research papers and get instant, concise summaries.
         </p>
+        <PdfUpload />
       </main>
     </div>
   )
