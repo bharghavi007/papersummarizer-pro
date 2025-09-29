@@ -1,6 +1,7 @@
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+from fastapi import HTTPException
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -10,7 +11,7 @@ def generate_summary(text: str) -> str:
         raise HTTPException(status_code=400, detail="Input text is empty, cannot summarize.")
 
     try:
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(
             f"Summarize this text in simple, concise points:\n\n{text}"
         )
