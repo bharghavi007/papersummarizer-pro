@@ -1,5 +1,6 @@
 import { useState } from "react"
 import axios from "axios"
+import { Dialog } from "@headlessui/react"
 
 function PdfUpload() {
   const [file, setFile] = useState(null)
@@ -7,6 +8,7 @@ function PdfUpload() {
   const [summary, setSummary] = useState("")
   const [loading, setLoading] = useState(false)
   const [summarizing, setSummarizing] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0])
@@ -38,6 +40,7 @@ function PdfUpload() {
       setSummarizing(true)
       const res = await axios.post("http://localhost:8000/summarize", { text: preview })
       setSummary(res.data.summary)
+      setIsOpen(true) // open modal
     } catch (err) {
       console.error(err)
       alert("Summarization failed!")
@@ -70,12 +73,23 @@ function PdfUpload() {
         </div>
       )}
 
-      {summary && (
-        <div className="mt-4 p-4 bg-gray-700 rounded-lg text-gray-100">
-          <h3 className="font-bold mb-2">Summary:</h3>
-          <p>{summary}</p>
+      {/* Modal for Summary */}
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
+          <Dialog.Panel className="w-full max-w-2xl bg-gray-900 rounded-lg p-6 text-white shadow-xl">
+            <Dialog.Title className="text-xl font-bold mb-4">Summary</Dialog.Title>
+            <div className="max-h-[60vh] overflow-y-auto text-gray-300 whitespace-pre-line">
+              {summary}
+            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="mt-6 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold"
+            >
+              Close
+            </button>
+          </Dialog.Panel>
         </div>
-      )}
+      </Dialog>
     </div>
   )
 }
