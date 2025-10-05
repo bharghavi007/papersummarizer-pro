@@ -1,6 +1,7 @@
 import { useState } from "react"
 import axios from "axios"
 import { Dialog } from "@headlessui/react"
+import { Upload as UploadIcon, Loader2, FileText } from "lucide-react"
 
 function PdfUpload() {
   const [file, setFile] = useState(null)
@@ -18,8 +19,10 @@ function PdfUpload() {
 
   const handleUpload = async () => {
     if (!file) return alert("Select a PDF first!")
+
     const formData = new FormData()
     formData.append("file", file)
+
     try {
       setLoading(true)
       const res = await axios.post("http://localhost:8000/upload-pdf", formData, {
@@ -36,11 +39,12 @@ function PdfUpload() {
 
   const handleSummarize = async () => {
     if (!preview) return alert("No text to summarize!")
+
     try {
       setSummarizing(true)
       const res = await axios.post("http://localhost:8000/summarize", { text: preview })
       setSummary(res.data.summary)
-      setIsOpen(true) // open modal
+      setIsOpen(true)
     } catch (err) {
       console.error(err)
       alert("Summarization failed!")
@@ -50,40 +54,69 @@ function PdfUpload() {
   }
 
   return (
-    <div className="max-w-lg mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
-      <input type="file" accept="application/pdf" onChange={handleFileChange} className="w-full mb-4" />
+    <div className="w-full bg-gray-800/90 backdrop-blur-lg p-8 rounded-3xl shadow-xl transition-all duration-300 hover:shadow-indigo-600/30">
+      {/* Upload Box */}
+      <label className="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-2xl py-10 bg-gray-900/50 hover:border-indigo-400 hover:bg-gray-800/60 transition-all duration-300">
+        <UploadIcon className="w-10 h-10 text-indigo-400 mb-3" />
+        <span className="text-gray-300 font-medium">
+          {file ? file.name : "Click to choose your PDF file"}
+        </span>
+        <input type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
+      </label>
+
+      {/* Upload Button */}
       <button
         onClick={handleUpload}
-        className="w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-black font-bold mb-4"
+        disabled={loading}
+        className="mt-6 w-full flex justify-center items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
       >
-        {loading ? "Uploading..." : "Upload"}
+        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UploadIcon className="w-5 h-5" />}
+        {loading ? "Uploading..." : "Upload PDF"}
       </button>
 
+      {/* Preview Section */}
       {preview && (
-        <div className="mt-4 p-4 bg-gray-700 rounded-lg text-gray-100">
-          <h3 className="font-bold mb-2">Preview:</h3>
-          <p>{preview}</p>
+        <div className="mt-8 bg-gray-900/60 p-6 rounded-2xl border border-gray-700 text-gray-300">
+          <div className="flex items-center gap-2 mb-3">
+            <FileText className="w-5 h-5 text-indigo-400" />
+            <h3 className="font-semibold text-indigo-300">Extracted Preview</h3>
+          </div>
+          <p className="text-sm text-gray-400 whitespace-pre-line max-h-48 overflow-y-auto">
+            {preview}
+          </p>
 
+          {/* Summarize Button */}
           <button
             onClick={handleSummarize}
-            className="mt-4 w-full py-2 px-4 bg-green-500 hover:bg-green-600 rounded-lg font-bold"
+            disabled={summarizing}
+            className="mt-6 w-full flex justify-center items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
           >
-            {summarizing ? "Summarizing..." : "Summarize"}
+            {summarizing ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" /> Summarizing...
+              </>
+            ) : (
+              <>
+                <SparklesIcon /> Summarize with AI
+              </>
+            )}
           </button>
         </div>
       )}
 
-      {/* Modal for Summary */}
+      {/* Summary Modal */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
-          <Dialog.Panel className="w-full max-w-2xl bg-gray-900 rounded-lg p-6 text-white shadow-xl">
-            <Dialog.Title className="text-xl font-bold mb-4">Summary</Dialog.Title>
-            <div className="max-h-[60vh] overflow-y-auto text-gray-300 whitespace-pre-line">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <Dialog.Panel className="bg-gray-900 text-white rounded-2xl max-w-3xl w-full p-8 shadow-2xl">
+            <Dialog.Title className="text-2xl font-bold text-indigo-400 mb-4">
+              🧠 AI Summary
+            </Dialog.Title>
+            <div className="max-h-[65vh] overflow-y-auto text-gray-300 whitespace-pre-line leading-relaxed">
               {summary}
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="mt-6 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold"
+              className="mt-6 bg-red-500 hover:bg-red-600 px-5 py-2 rounded-lg font-semibold transition-all"
             >
               Close
             </button>
@@ -91,6 +124,25 @@ function PdfUpload() {
         </div>
       </Dialog>
     </div>
+  )
+}
+
+function SparklesIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-5 h-5 text-yellow-300"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M12 3v4m0 10v4m9-9h-4m-10 0H3m6.364-5.636l-2.828 2.828m11.314 0-2.828-2.828m0 11.314 2.828-2.828m-11.314 0 2.828 2.828"
+      />
+    </svg>
   )
 }
 

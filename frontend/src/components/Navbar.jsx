@@ -28,8 +28,10 @@ function Navbar() {
           <Link to="/upload" className={linkClasses("/upload")}>
             Upload
           </Link>
+          <Link to="/compare" className={linkClasses("/compare")}>
+            Compare
+        </Link>
         </div>
-
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from routers import health, pdf, summarize
+from routers import health, pdf, summarize,compare
 from dotenv import load_dotenv
 from logger import logger
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,5 +30,7 @@ async def log_requests(request: Request, call_next):
 app.include_router(health.router)
 app.include_router(pdf.router)
 app.include_router(summarize.router)
+app.include_router(compare.router)
+
 
 
