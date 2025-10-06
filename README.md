@@ -37,9 +37,7 @@ Frontend runs on: http://localhost:5173
 ## 📌 Roadmap
 - [X] PDF upload & text extraction
 - [X] Single paper summarization
-- [ ] Multi-paper comparison
-- [ ] Literature review generator
-- [ ] Export (PDF/Word)
+- [X] Multi-paper comparison
 
 ## 📜 License
 MIT License
